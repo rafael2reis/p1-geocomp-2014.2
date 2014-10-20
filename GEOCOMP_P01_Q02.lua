@@ -1,5 +1,13 @@
 local array_utils = require("array_utils")
 
+--Definimos os vetores V e O
+--local V = { 0, 2, 7, 2, 5, 7 }
+--local O = { "y", 5, "x", "z", "w", 1 }
+--local he_flip = 5
+local V = {0, 4, 1, 1, 4, 5, 1, 5, 2, 2, 5, 3, 3, 5, 6, 3, 6, 7, 3, 7, 8, 3, 8, 9}
+local O = {-1, 3, -1, 1, -1, 6, 5, 9, -1, 7, 12, -1, 10, -1, 15, 14, -1, 18, 17, -1, 21, 20, -1, -1}
+local he_flip = 3
+
 function prev(he)
 	return 3 * math.floor( he / 3 ) + (he + 2) % 3
 end
@@ -55,19 +63,28 @@ function flip(V, O, he)
 
 end
 
+function toArrayComecandoEmZero(A)
+	local novo = {}
+	for i=1,#A do
+		novo[i-1] = A[i]
+	end
+
+	return novo
+end
+
 function teste()
-	local V = {[0]=0, [1]=2, [2]=7, [3]=2, [4]=5, [5]=7}
-	local O = {[0]="y", [1]=5, [2]="x", [3]="z", [4]="w", [5]=1 }
+	local vetor_V = toArrayComecandoEmZero(V)
+	local vetor_O = toArrayComecandoEmZero(O)
 
 	print("Antes: ")
-	array_utils.print(V, "V")
-	array_utils.print(O, "O")
+	array_utils.print(vetor_V, "V")
+	array_utils.print(vetor_O, "O")
 
-	flip(V, O, 5)
+	flip(vetor_V, vetor_O, he_flip)
 
 	print("Depois do flip: ")
-	array_utils.print(V, "V")
-	array_utils.print(O, "O")
+	array_utils.print(vetor_V, "V")
+	array_utils.print(vetor_O, "O")
 end
 
 teste()

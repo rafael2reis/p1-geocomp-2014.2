@@ -1,6 +1,7 @@
 local array_utils = require("array_utils")
 local sort_utils = require("sort_utils")
 
+-- Definimos os pontos X[i]Y[i]
 local X = { 0, 1, 2, 3, 1.5, 1.8, 4, 5, 5.5, 5.9 }
 local Y = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 }
 
