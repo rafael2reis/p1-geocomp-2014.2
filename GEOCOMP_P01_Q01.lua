@@ -1,20 +1,8 @@
 local array_utils = require("array_utils")
+local sort_utils = require("sort_utils")
 
-local set_A = {
-	[0] = {x = 0, y = 0},
-	[1] = {x = 1, y = 0},
-	[2] = {x = 2, y = 0},
-	[3] = {x = 3, y = 0}
-}
-
-local set_B = {
-	[0] = {x = 1.5, y = 1},
-	[1] = {x = 1.8, y = 1},
-	[2] = {x = 4, y = 1},
-	[3] = {x = 5, y = 1},
-	[4] = {x = 5.5, y = 1},
-	[5] = {x = 5.9, y = 1}
-}
+local X = { 0, 1, 2, 3, 1.5, 1.8, 4, 5, 5.5, 5.9 }
+local Y = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 }
 
 local indice_P = 0
 local indice_Q = 0
@@ -22,17 +10,47 @@ local indice_Q = 0
 local m = 0
 local n = 0
 
--- Estrutura de dados da CHE
-local vetor_V = {}
-local vetor_O = {}
+-- A partir dos pontos informados, cria
+-- dois conjuntos, um para cada valor de y, 
+-- colocando cada ponto i informado
+-- numa estrutura { x = X[i], y = Y[i]}
+function montaConjuntoDePontos(pontos_X, pontos_Y)
+	if #pontos_X ~= #pontos_Y then
+		print("Quantidade de pontos X diferente de Y!")
+	else
+		local set_A = {}
+		local set_B = {}
 
-function imprimeTriangulo(indice, triangulo)
-	print("Triangulo " .. indice .. ":")
-	io.write("\t(" .. triangulo[1].x .. ", " .. triangulo[1].y .. "), ")
-	io.write("\t(" .. triangulo[2].x .. ", " .. triangulo[2].y .. "), ")
-	print("\t(" .. triangulo[3].x .. ", " .. triangulo[3].y .. ")")
+		local y_A = pontos_Y[1]
+
+		local indice_A = 0
+		local indice_B = 0
+
+		for i=1,#pontos_X do
+			if pontos_Y[i] == y_A then
+				set_A[ indice_A ] = {x = pontos_X[i], y = pontos_Y[i]}
+				indice_A = indice_A + 1
+			else
+				set_B[ indice_B ] = {x = pontos_X[i], y = pontos_Y[i]}
+				indice_B = indice_B + 1
+			end
+		end
+
+		if y_A > set_B[0].y then
+			return set_A, set_B
+		else
+			return set_B, set_A
+		end
+	end
 end
 
+-- Procedimento similar ao Merge do MergeSort:
+-- Dados os conjuntos P e Q, retorna o
+-- índice do menor elemento de P U Q
+
+-- No retorno do índice, consideramos:
+--	* índices de P variando de 0 até m - 1
+-- 	* índices de Q de m até n - 1
 function proximoVerticeMenorEmX(set_P, set_Q)
 	if (indice_P + 1) < m
 		and (indice_Q + 1) < n then
@@ -55,13 +73,24 @@ function proximoVerticeMenorEmX(set_P, set_Q)
 	end
 end
 
-function triangle(set_P, set_Q)
+function triangle(pontos_X, pontos_Y)
 	local nt = 0
-	m = #set_P + 1
-	n = #set_Q + 1
 
+	-- O conjunto P será formado pelos pontos
+	-- cuja ordenada_P > ordenada_Q
+	local set_P, set_Q = montaConjuntoDePontos(pontos_X, pontos_Y)
+
+	-- Ordenamos os pontos
+	sort_utils.ordenaEmX(set_P)
+	sort_utils.ordenaEmX(set_Q)
+
+	m = #set_P + 1 -- Lua começa os arrays em 0. Precisamos
+	n = #set_Q + 1 -- adicionar 1 ao valor do tamanho
+
+	-- Estruturas de dados da CHE
 	local V = {}
 	local O = {}
+	-- Inicializa vetor Opposite
 	for i=0,(n+m)*3 do O[i] = -1 end
 
 	V[0] = 0 -- menor vértice em P
@@ -69,8 +98,12 @@ function triangle(set_P, set_Q)
 	V[2] = proximoVerticeMenorEmX(set_P, set_Q)
 	nt = nt + 1
 
+	-- Enquanto existir ponto em P ou Q
+	-- não utilizado na triangulação
 	while indice_P < m - 1
 		or indice_Q < n - 1 do
+		-- índice da próxima half-edge a ser
+		-- inserida na estrutura
 		local he = nt * 3
 
 		-- Definimos a orientação das half-edges
@@ -94,4 +127,4 @@ function triangle(set_P, set_Q)
 	array_utils.print(O, "O")
 end
 
-triangle(set_A, set_B)
+triangle(X, Y)
